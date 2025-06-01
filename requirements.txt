@@ -1,0 +1,6 @@
+pandas
+geopandas
+numpy
+pyarrow
+geoarrow-pyarrow
+overturemaps
