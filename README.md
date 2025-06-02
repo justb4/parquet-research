@@ -384,3 +384,92 @@ websites: [[null,["http://prodajnicentarmostar.com/"],...,null,null]]
   write(
 
 ```
+
+## geoarrow-rs Python bindings
+
+Alternative to geoarrow-pyarrow is a Rust implementation for 
+geoarrow with Python bindings by [Kyle Barron](https://github.com/kylebarron).
+Has smaller library footprint: 53MB (vs 110MB for pyarrow).
+
+* https://geoarrow.org/geoarrow-rs/python/latest/
+
+### Install
+One can selectively install modules:
+
+```
+du -sh /Users/just/.pyenv/versions/geoarrow-rs/
+ 12M	/Users/just/.pyenv/versions/geoarrow-rs/
+ 
+(geoarrow-rs) $ pip install geoarrow-rust-io
+Collecting geoarrow-rust-io
+  Downloading geoarrow_rust_io-0.3.0-cp38-abi3-macosx_11_0_arm64.whl.metadata (927 bytes)
+Collecting arro3-core (from geoarrow-rust-io)
+  Downloading arro3_core-0.5.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (949 bytes)
+Collecting pyproj (from geoarrow-rust-io)
+  Using cached pyproj-3.7.1-cp312-cp312-macosx_14_0_arm64.whl.metadata (31 kB)
+Collecting certifi (from pyproj->geoarrow-rust-io)
+  Using cached certifi-2025.4.26-py3-none-any.whl.metadata (2.5 kB)
+Downloading geoarrow_rust_io-0.3.0-cp38-abi3-macosx_11_0_arm64.whl (9.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.3/9.3 MB 4.4 MB/s eta 0:00:00
+Downloading arro3_core-0.5.1-cp312-cp312-macosx_11_0_arm64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 5.4 MB/s eta 0:00:00
+Using cached pyproj-3.7.1-cp312-cp312-macosx_14_0_arm64.whl (4.7 MB)
+Using cached certifi-2025.4.26-py3-none-any.whl (159 kB)
+Installing collected packages: certifi, arro3-core, pyproj, geoarrow-rust-io
+Successfully installed arro3-core-0.5.1 certifi-2025.4.26 geoarrow-rust-io-0.3.0 pyproj-3.7.1
+
+(geoarrow-rs) $ pip freeze
+arro3-core==0.5.1
+certifi==2025.4.26
+geoarrow-rust-io==0.3.0
+pyproj==3.7.1
+(geoarrow-rs) $ du -sh /Users/just/.pyenv/versions/geoarrow-rs/
+ 65M	/Users/just/.pyenv/versions/geoarrow-rs/
+
+```
+
+### Read GeoParquet 
+
+* https://geoarrow.org/geoarrow-rs/python/latest/api/io/geoparquet/
+* [geoarrow-rust.py](geoarrow-rust.py)
+
+
+```python
+from geoarrow.rust.io import read_parquet, write_parquet
+
+table = read_parquet("data/random-write.parquet")
+print(table)
+
+# Write with default GeoParquetEncoding.WKB
+write_parquet(table, 'data/random-write.parquet')
+
+
+# url = "https://raw.githubusercontent.com/opengeospatial/geoparquet/v1.0.0/examples/example.parquet"
+# table = read_parquet(url)
+# print(table)
+
+```
+
+```
+$ python geoarrow-rust.py 
+arro3.core.Table
++------------+-------------+-------------------------------------+--------------------------------------------+-------+
+| lat        | lon         | time                                | geometry                                   | id    |
+| Float64    | Float64     | Timestamp(Microsecond, Some("UTC")) | Binary                                     | Int64 |
++------------+-------------+-------------------------------------+--------------------------------------------+-------+
+| -58.017774 | 114.386131  | 2022-02-14T14:34:26Z                | 0101000000323ecc5eb6985c400c5c1e6b46024dc0 | 1     |
+| 56.909984  | 51.174536   | 2022-03-15T20:54:53Z                | 0101000000c2fc1532579649400ff10f5b7a744c40 | 2     |
+| 60.63901   | 106.214013  | 2022-09-24T13:20:03Z                | 0101000000cefa9463b28d5a4092e86514cb514e40 | 3     |
+| 17.35044   | 127.302361  | 2022-12-24T20:54:45Z                | 01010000007fa5f3e159d35f40d235936fb6593140 | 4     |
+| -43.550597 | 119.844457  | 2022-04-14T17:10:20Z                | 010100000036785f950bf65d404b2366f679c645c0 | 5     |
+| 85.813849  | 172.160086  | 2022-01-10T20:16:06Z                | 010100000085d1ac6c1f85654078b81d1a16745540 | 6     |
+| -69.28685  | -15.076833  | 2022-06-14T18:29:01Z                | 0101000000d481aca756272ec0e3361ac05b5251c0 | 7     |
+| 71.773748  | -153.330691 | 2022-04-05T01:56:29Z                | 01010000009cc24a05952a63c01bd6541685f15140 | 8     |
+| 9.665681   | -24.657223  | 2022-03-18T15:08:17Z                | 0101000000d32d3bc43fa838c01c23d923d4542340 | 9     |
+| 17.727209  | -134.25762  | 2022-04-23T14:14:07Z                | 010100000075594c6c3ec860c05b5b785e2aba3140 | 10    |
++------------+-------------+-------------------------------------+--------------------------------------------+-------+
+```
+
+### Overture Maps fetch
+Trying to fetch by theme and bbox, but got stuck. See discussion:
+https://github.com/geoarrow/geoarrow-rs/discussions/1173
